@@ -109,6 +109,12 @@ def base_opts(**extra) -> dict:
     opts = {"quiet": True, "no_warnings": True, **extra}
     if REMOTE_COMPONENTS:
         opts["remote_components"] = REMOTE_COMPONENTS.split(",")
+    # yt-dlp only auto-enables deno as its JS runtime; bun and node exist but
+    # are ignored unless named. A machine with bun and no deno (a laptop, say)
+    # would otherwise solve no challenges and get videos with missing formats.
+    runtime = _js_runtime()
+    if runtime and runtime != "deno":
+        opts["js_runtimes"] = {runtime: {}}
     if CACHE_DIR:
         opts["cachedir"] = CACHE_DIR
     if COOKIEFILE_LIVE:
